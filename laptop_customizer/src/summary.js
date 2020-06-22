@@ -1,7 +1,7 @@
-const summary = Object.keys(this.state.selected).map((feature, idx) => {
-    const featureHash = feature + '-' + idx;
-    const selectedOption = this.state.selected[feature];
+import summary from 'summary';
 
+class summary extends React.Component {
+  render() {
     return (
       <div className="summary__option" key={featureHash}>
         <div className="summary__option__label">{feature} </div>
@@ -11,4 +11,7 @@ const summary = Object.keys(this.state.selected).map((feature, idx) => {
         </div>
       </div>
     );
-  });
+  };
+} 
+
+export default summary;

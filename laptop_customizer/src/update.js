@@ -1,3 +1,5 @@
+import updateFeature from 'updateFeature';
+
 updateFeature = (feature, newValue) => {
     const selected = Object.assign({}, this.state.selected);
     selected[feature] = newValue;
@@ -5,3 +7,5 @@ updateFeature = (feature, newValue) => {
       selected
     });
   };
+
+  export default updateFeature;

@@ -1,107 +1,107 @@
 import React, { Component } from 'react';
-import { Router, Link, Route } from 'react-router-dom';
-//import { FontAwsomeIcon } from '@fortawesome/react-fontawesome';
-import NoteListNav from '../NoteListNav/NoteListNav';
-import NotePageNav from '../NotePageNav/NotePageNav';
-import NoteListMain from '../NoteListMain/NoteListMain';
-import NotePageMain from '../NotePageMain/NotePageMain';
-import dummyStore from '../dummy-store/dummy-store';
-import {getNotesForFolder, findNote, findFolder} from '../notes-helpers';
-import './App.css';
+import slugify from './slugify';
+import current from './current';
+import route from './route';
+import summary from './summary';
+import update from './update';
 
 class App extends Component {
-    state = {
-        notes: [],
-        folders: []
-    };
+// Normalizes string as a slug - a string that is safe to use
+// in both URLs and html attributes
+import slugify from 'slugify';
 
-    componentDidMount() {
-        // fake date loading from API call
-        setTimeout(() => this.setState(dummyStore), 600);
-    }
+import './App.css';
 
-    renderNavRoutes() {
-        const {notes, folders} = this.state;
+// This object will allow us to
+// easily convert numbers into US dollar values
+const USCurrencyFormat = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD'
+});
+
+  updateFeature = (feature, newValue) => {
+    const selected = Object.assign({}, this.state.selected);
+    selected[feature] = newValue;
+    this.setState({
+      selected
+    });
+
+  render() {
+    const features = Object.keys(this.props.features).map((feature, idx) => {
+      const featureHash = feature + '-' + idx;
+      const options = this.props.features[feature].map(item => {
+        const itemHash = slugify(JSON.stringify(item));
         return (
-            <>
-            {['/', '/folder/:folderId'].map(path => (
-                <Route
-                    exact
-                    key={path}
-                    path={path}
-                    render={routeProps => (
-                        <NoteListNav
-                            folders={folders}
-                            notes={notes}
-                            {...routeProps}
-                        />
-                    )}
-                />
-            ))}
-            <Route
-                path="/note/:noteId"
-                render={routeProps => {
-                    const {noteId} = routeProps.match.params;
-                    const note = findNote(notes, noteId) || {};
-                    const folder = findFolder(folders, note.folderId);
-                    return <NotePageNav {...routeProps} folder={folder} />;
-                }}
+          <div key={itemHash} className="feature__item">
+            <input
+              type="radio"
+              id={itemHash}
+              className="feature__option"
+              name={slugify(feature)}
+              checked={item.name === this.state.selected[feature].name}
+              onChange={e => this.updateFeature(feature, item)}
             />
-            <Route path="/add-folder" component={NotePageNav} />
-            <Route path="/add-note" component={NotePageNav} />
-        </>
-       );
-    }
-    
-    renderMainRoutes() {
-        const {notes, folders} = this.state;
-        return (
-            <>
-                {['/', '/folder/:folderId'].map(path => (
-                    <Route
-                        exact
-                        key={path}
-                        path={path}
-                        render={routeProps => {
-                            const {folderId} = routeProps.match.params;
-                            const notesForFolder = getNotesForFolder(
-                                notes,
-                                folderId
-                            );
-                            return (
-                                <NoteListMain
-                                    {...routeProps}
-                                    notes={notesForFolder}
-                                />
-                            );
-                        }}
-                    />
-                ))}
-                <Route
-                    path="/note/:noteId"
-                    render={routeProps => {
-                        const {noteId} = routeProps.match.params;
-                        const note = findNote(notes, noteId);
-                    }}
-                   />
-                 </>
-                            
-              );
-           }
-           render() {
-               return (
-                   <div className="App">
-                       <nav className="App__nav">{this.renderNavRoutes()}</nav>
-                       <header className="App__header">
-                           <h1>
-                               <Link to="/">Noteful</Link>{' '}
-                               {/* <FontAwsomeIcon icon="check-double" /> */}
-                           </h1>
-                       </header>
-                       <main className="App__main">{this.renderMainRoutes()}</main>
-                   </div>
-               );
-           }
-    }
+            <label htmlFor={itemHash} className="feature__label">
+              {item.name} ({USCurrencyFormat.format(item.cost)})
+            </label>
+          </div>
+        );
+      });
 
-    export default App;
+      return (
+        <fieldset className="feature" key={featureHash}>
+          <legend className="feature__name">
+            <h3>{feature}</h3>
+          </legend>
+          {options}
+        </fieldset>
+      );
+    });
+
+    const summary = Object.keys(this.state.selected).map((feature, idx) => {
+      const featureHash = feature + '-' + idx;
+      const selectedOption = this.state.selected[feature];
+
+      return (
+        <div className="summary__option" key={featureHash}>
+          <div className="summary__option__label">{feature} </div>
+          <div className="summary__option__value">{selectedOption.name}</div>
+          <div className="summary__option__cost">
+            {USCurrencyFormat.format(selectedOption.cost)}
+          </div>
+        </div>
+      );
+    });
+
+    const total = Object.keys(this.state.selected).reduce(
+      (acc, curr) => acc + this.state.selected[curr].cost,
+      0
+    );
+
+    return (
+      <div className="App">
+        <header>
+          <h1>ELF Computing | Laptops</h1>
+        </header>
+        <main>
+          <form className="main__form">
+            <h2>Customize your laptop</h2>
+            {features}
+          </form>
+          <section className="main__summary">
+            <h2>Your cart</h2>
+            {summary}
+            <div className="summary__total">
+              <div className="summary__total__label">Total</div>
+              <div className="summary__total__value">
+                {USCurrencyFormat.format(total)}
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
+  }
+}
+}
+export default App;

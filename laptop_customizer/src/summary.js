@@ -1,4 +1,4 @@
-import slugify from "slugify";
+import summary from "summary";
 
 // import summary from 'summary';
 
@@ -16,4 +16,4 @@ import slugify from "slugify";
 //   };
 // } 
 
-export default slugify;
+export default summary;

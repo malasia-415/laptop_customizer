@@ -1,5 +1,4 @@
 import React from 'react';
-// import USCurrencyFormat from './USCurrencyFormat';
 import Total from './Total';
 import SummaryOptions from './SummaryOptions';
 
